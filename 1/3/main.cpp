@@ -1,51 +1,54 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 using namespace std;
-int main()
+int dfs(int v,vector<vector<int>> A,vector<bool> used) {
+
+    int n=0;
+    if (used[v]) {
+        return n;
+    }
+    n+=1;
+    used[v] = true;
+    for (auto i:A[v])
+    {
+        n+=dfs(i,A,used);
+    }
+    return n;
+}
+using namespace std;
+int main(int argc, char *argv[])
 {
-    ///---------------input data ---------------
-    ifstream in("connect.in");
+    vector<vector<int>> A;
     int N,M;
+    ///---------------read data ---------------
+    ifstream in("connect.in");
     in>>N>>M;
-    bool** A=new bool*[N];
-    for(int i=0;i<N;i++)
-        A[i]=new bool[N];
+    A.resize(N);
     for(int i=0;i<M;i++)
     {
         int a,b;
         in>>a>>b;
-        A[a][b]=true;
+        a--;
+        b--;
+        A[a].push_back(b);
+        A[b].push_back(a);
     }
     in.close();
     bool isConnected=true;
-    auto dfs= [=]()
-    {
-        return true;
-    };
-
+    ///---------- begin dfs -----------
     for(int i=0;i<N;i++)
     {
-        bool* B=new bool[N];
-        for(int j=0;j<N;i++)
-        {
-            if(A[i,j])
-            {
-                B[j]=true;
-                continue;
-            }else{
-
-            }
-        }
+        vector<bool> used(A.size());
+        isConnected=dfs(i,A,used)==N;
     }
     ofstream out("connect.out");
-    out << isConnected?"YES":"NO";
+    string s=isConnected?"YES":"NO";
+    out << s;
     ///------release memory ---------------
     out.close();
-    for(int i=0;i<N;i++)
-        delete A[i];
-    delete A;
     return 0;
 }
 

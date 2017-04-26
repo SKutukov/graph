@@ -3,12 +3,12 @@
 #include <string>
 
 using namespace std;
-int main()
+int main(int argc, char *argv[])
 {
-    ifstream in("sum.in");
+    ifstream in("topsort.in");
     int a,b;
     in>>a>>b;
-    ofstream out("sum.out");
+    ofstream out("topsort.out");
     out << a+b;
     out.close();
     return 0;
