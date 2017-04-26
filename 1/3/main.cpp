@@ -4,48 +4,61 @@
 #include <vector>
 
 using namespace std;
-int dfs(int v,vector<vector<int>> A,vector<bool> used) {
 
-    int n=0;
-    if (used[v]) {
-        return n;
-    }
-    n+=1;
+
+const int size =100;
+int N,M;
+vector<int> adj[size];
+bool used[size];
+vector<int> comp;
+
+void dfs(int v) {
     used[v] = true;
-    for (auto i:A[v])
-    {
-        n+=dfs(i,A,used);
+    comp.push_back(v);
+    for (size_t i=0; i<adj[v].size(); ++i) {
+        int next = adj[v][i];
+        if (! used[next])
+            dfs (next);
     }
+}
+
+int find_comps() {
+    for (int i=0; i<N; ++i)
+        used[i] = false;
+    int n=0;
+    for (int i=0; i<N; ++i)
+        if (! used[i]) {
+            n++;
+            comp.clear();
+            dfs (i);
+
+        }
     return n;
 }
+
 using namespace std;
 int main(int argc, char *argv[])
 {
-    vector<vector<int>> A;
-    int N,M;
     ///---------------read data ---------------
     ifstream in("connect.in");
     in>>N>>M;
-    A.resize(N);
     for(int i=0;i<M;i++)
     {
         int a,b;
         in>>a>>b;
         a--;
         b--;
-        A[a].push_back(b);
-        A[b].push_back(a);
+        adj[a].push_back(b);
+        adj[b].push_back(a);
     }
     in.close();
     bool isConnected=true;
     ///---------- begin dfs -----------
-    for(int i=0;i<N;i++)
-    {
-        vector<bool> used(A.size());
-        isConnected=dfs(i,A,used)==N;
-    }
+    isConnected=find_comps()==1;
+
     ofstream out("connect.out");
     string s=isConnected?"YES":"NO";
+    std::cout<<s<<std::endl;
     out << s;
     ///------release memory ---------------
     out.close();
