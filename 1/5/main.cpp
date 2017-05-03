@@ -6,14 +6,18 @@
 using namespace std;
 int MAXN=100000;
 int N,M;
-
+vector<bool> used(MAXN);
 vector<vector<int> > adj;
 void dfs(int cur, int &n) {
   int max_d=0;
+  used[cur]=true;
   for (int next :adj[cur]) {
-        int d=1;
-        dfs(next,d);
-        max_d=std::max(d,max_d);
+        if(!used[next])
+        {
+            int d=1;
+            dfs(next,d);
+            max_d=std::max(d,max_d);
+        }
   }
   n+=max_d;
 }
@@ -21,7 +25,10 @@ int longpath() {
   int max=0;
   for (int i=0;i<N;i++) {
         int n=0;
-        dfs(i,n);
+        if(!used[i])
+        {
+            dfs(i,n);
+        }
         max=std::max(max,n);
     }
   return max;
