@@ -2,42 +2,45 @@
 #include <fstream>
 #include <string>
 #include <vector>
-
+#include "deque"
 using namespace std;
 int MAXN=100000;
 int N,M;
-enum COLOR{WHITE,GRAY,BLACK};
 vector<vector<int> > adj;
-vector<COLOR> used(MAXN);
+vector<bool> used(MAXN);
 bool isCycleExist=false;
-vector<int> cycle;
-void dfs(int cur, vector<int> &res) {
-    used[cur] = GRAY;
-  for (int next :adj[cur]) {
-    if (used[next] == GRAY)
+bool isCycleEnd=false;
+deque<int> cycle;
+int b;
+void dfs(int cur) {
+    used[cur] = true;
+   for (int next :adj[cur]) {
+    if (used[next] == true)
     {
-          isCycleExist=true;
-          cycle.push_back(cur);
-          return;
+       b=next;
+       isCycleExist=true;
     }
-    if (isCycleExist)
+    if(isCycleExist &&  isCycleEnd)
     {
-        cycle.push_back(cur);
+        if(cur!=b)
+        {
+           isCycleEnd=true;
+        }else
+        {
+            cycle.push_front(cur);
+        }
     }
-    if (used[next] == WHITE)
-      dfs(next,res);
+    dfs(next);
   }
-  used[cur] = BLACK;
-  res.push_back(cur);
 }
-void findCycle(vector<int> &res) {
+void findCycle() {
   for (int i=0;i<N;i++) {
     if(isCycleExist==true)
     {
         break;
     }
-    if (used[i] == WHITE) {
-        dfs(i,res);
+    if (used[i] == false) {
+        dfs(i);
       }
     }
 }
@@ -59,16 +62,15 @@ int main(int argc, char *argv[])
     }
     in.close();
     ///------------topsort -------------
-    vector<int> res;
-    findCycle(res);
+    findCycle();
     ///------------output data -----------
     ofstream out("cycle.out");
     if(isCycleExist)
     {
         out<< "YES"<<std::endl;
-        for(auto c:cycle)
+        for(int i=0;i<cycle.size();i++)
         {
-            out<<c<<' ';
+            out<<cycle[i]+1<<' ';
         }
     }else{
         out << "NO";
