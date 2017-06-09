@@ -8,18 +8,26 @@ int MAXN=100000;
 int N,M;
 vector<bool> used(MAXN);
 vector<vector<int> > adj;
-void dfs(int cur, int &n) {
+vector<int> depths;
+
+int dfs(int cur) {
   int max_d=0;
   used[cur]=true;
-  for (int next :adj[cur]) {
+
+  for (int next :adj[cur])
+  {
         if(!used[next])
         {
-            int d=1;
-            dfs(next,d);
-            max_d=std::max(d,max_d);
+            int d=dfs(next);
+            max_d=std::max(d+1,max_d);
+        }
+        if (used[next])
+        {
+            max_d=std::max(depths[next] + 1,max_d);
         }
   }
-  n+=max_d;
+  depths[cur]=max_d;
+  return max_d;
 }
 int longpath() {
   int max=0;
@@ -27,9 +35,10 @@ int longpath() {
         int n=0;
         if(!used[i])
         {
-            dfs(i,n);
+           n=dfs(i);
+           max=std::max(max,n);
         }
-        max=std::max(max,n);
+
     }
   return max;
 }
@@ -41,6 +50,7 @@ int main(int argc, char *argv[])
     ifstream in("longpath.in");
     in>>N>>M;
     adj.resize(N);
+    depths.resize(N);
     for(int i=0;i<M;i++)
     {
         int a,b;
@@ -51,10 +61,10 @@ int main(int argc, char *argv[])
     }
     in.close();
     ///------------topsort -------------
-    int n=longpath();
+    int maxLen=longpath();
     ///------------output data -----------
     ofstream out("longpath.out");
-    out<<n;
+    out<<maxLen;
     ///------release memory ---------------
     out.close();
     return 0;

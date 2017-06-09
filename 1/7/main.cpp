@@ -8,24 +8,29 @@
 using namespace std;
 int MAXN=100000;
 int N,M;
-
+int color=0;
 vector<vector<int>> adj, adjT;
 vector<int> used;
 vector<int> colors;
-int color=0;
-vector<int> order,component;
-vector<set<int>> component_adj;
-void dfs1 (int v) {
-    used[v] = true;
-    for (size_t i=0; i<adj[v].size(); ++i)
-        if (!used[ adj[v][i] ])
-            dfs1 (adj[v][i]);
-    order.push_back (v);
-}
+vector<int> order;
+//vector<int> component;
+set<pair<int, int>> condense_adj;
 
+void dfs1(int v)
+{
+    used[v] = true;
+    for (int next : adj[v])
+    {
+        if (!used[next])
+        {
+            dfs1(next);
+        }
+    }
+    order.push_back(v);
+}
 void dfs2 (int v) {
     used[v] = true;
-    component.push_back(v);
+//    component.push_back(v);
     colors[v]=color;
     for (size_t i=0; i<adjT[v].size(); ++i)
         if (!used[ adjT[v][i] ])
@@ -52,46 +57,49 @@ int main(int argc, char *argv[])
     }
     in.close();
 
+///// first dfs
     used.assign (N, false);
     for (int i=0; i<N; ++i)
     {
         if (!used[i])
         {
-            dfs1 (i);
+            dfs1(i);
         }
     }
-    int a=0;
+
+/////////
+
     used.assign (N, false);
-    for (int i=0; i<N; ++i)
+    for (int i = 0; i != order.size(); i++)
     {
-        int v = order[N-1-i];
-        if (!used[v])
+                int v = order[N-1-i];
+                if (!used[v])
+                {
+                    color++;
+                    dfs2 (v);
+//                    for(int i=0;i<component.size();i++)
+//                    {
+//                        std::cout<<component[i]<<' ';
+//                    }
+//                    component.clear();
+                }
+ //               std::cout<<std::endl;
+    }
+
+    for (int i = 0; i < N; i++)
+    {
+        for (int j : adj[i])
         {
-            a++;
-            dfs2 (v);
-            for(int i=0;i<component.size();i++)
+            if (colors[i] != colors[j])
             {
-                std::cout<<component[i]<<' ';
+                condense_adj.insert(make_pair(colors[i], colors[j]));
             }
-            component.clear();
-        }
-        std::cout<<std::endl;
-    }
-    component_adj.resize(a);
-    for(int i=0;i<adj.size();i++)
-    {
-        for(int j=0;j<adj[i].size();j++)
-        {
-            component_adj[colors[i]].insert(colors[j]);
         }
     }
-    int c=0;
-    for(int i=0;i<component_adj.size();i++)
-    {
-        c+=component_adj[i].size();
-    }
+
+
    ofstream out("condense2.out");
-   out<<c;
+   out<<condense_adj.size();
    out.close();
 
    return 0;
